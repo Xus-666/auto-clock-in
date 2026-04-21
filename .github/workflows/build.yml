@@ -39,13 +39,13 @@ jobs:
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline.zip
           unzip -q cmdline.zip && mv cmdline-tools latest && rm cmdline.zip
 
-          # 自动接受所有 license（不再手动写 hash）
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          # 自动接受所有 license（包含 build-tools;37.0.0）
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME > /dev/null 2>&1 || true
 
-          # 只装基础组件，build-tools 由 buildozer 自己决定版本
+          # 安装所有组件
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
             --sdk_root=$ANDROID_HOME \
-            "platform-tools" "platforms;android-34"
+            "platform-tools" "platforms;android-34" "build-tools;37.0.0"
 
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "ANDROIDSDK=$ANDROID_HOME" >> $GITHUB_ENV
