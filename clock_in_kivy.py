@@ -227,8 +227,8 @@ class ClockInLayout(BoxLayout):
             code = resp.get("code", resp.get("status", "unknown"))
             body = resp.get("body", resp.get("data", resp))
             msg = resp.get("message", "")
-
-            if code == 200 or code == "200":
+            success = resp.get("success", False)  
+            if success or code == 200 or code == "200":
                 type_text = "上班打卡" if clock_type == "1" else "下班打卡"
                 self.result_label.text = (
                     f"✅ 打卡成功！\n"
