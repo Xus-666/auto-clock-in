@@ -31,7 +31,7 @@ jobs:
           echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
           echo "$JAVA_HOME/bin" >> $GITHUB_PATH
 
-      - name: 📱 下载并配置 Android SDK
+      - name: 📱 下载 Android SDK command line tools
         run: |
           export ANDROID_HOME=/home/runner/android-sdk
           mkdir -p $ANDROID_HOME/cmdline-tools
@@ -39,16 +39,29 @@ jobs:
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline.zip
           unzip -q cmdline.zip && mv cmdline-tools latest && rm cmdline.zip
 
-          # 自动接受所有 license（包含 build-tools;37.0.0）
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME > /dev/null 2>&1 || true
+      - name: ✅ 接受所有 Android SDK license
+        run: |
+          export ANDROID_HOME=/home/runner/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          mkdir -p $ANDROID_HOME/licenses
 
-          # 安装所有组件
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-            --sdk_root=$ANDROID_HOME \
-            "platform-tools" "platforms;android-34" "build-tools;37.0.0"
+          # 写入所有已知的 license hash
+          printf "24333f8a63b6825ea9c5514f83c2829b004d1fee\n" > $ANDROID_HOME/licenses/android-sdk-license
+          printf "84831b9409646a918e30573bab4c9c91346d8abd\n" > $ANDROID_HOME/licenses/android-sdk-preview-license
+          printf "d56f5187479451eabf01fb78af6dfcb131a6481e\n" >> $ANDROID_HOME/licenses/android-sdk-license
+
+          # 尝试通过更新接受 license（这会一次性处理所有包的 license）
+          yes | sdkmanager --update --sdk_root=$ANDROID_HOME > /dev/null 2>&1 || true
 
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "ANDROIDSDK=$ANDROID_HOME" >> $GITHUB_ENV
+
+      - name: 📦 安装 Android SDK 组件
+        run: |
+          export ANDROID_HOME=/home/runner/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          sdkmanager --sdk_root=$ANDROID_HOME \
+            "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: 🐍 安装 Python 依赖
         run: |
