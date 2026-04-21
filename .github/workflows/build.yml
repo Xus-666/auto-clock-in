@@ -65,9 +65,11 @@ jobs:
           pip install kivy==2.2.0 requests buildozer cython
 
       - name: 🔨 构建 APK（buildozer 自动下载 NDK）
+        env:
+          ANDROID_HOME: /home/runner/android-sdk
+          ANDROIDSDK: /home/runner/android-sdk
         run: |
-          export ANDROID_HOME=/home/runner/android-sdk
-          export ANDROIDSDK=/home/runner/android-sdk
+          ls $ANDROID_HOME/build-tools/
           buildozer android debug
           ls -lh .buildozer/bin/
 
