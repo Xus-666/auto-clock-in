@@ -33,12 +33,11 @@ jobs:
 
       - name: 📱 下载并配置 Android SDK（自动接受协议）
         run: |
+          # 所有 Android SDK 相关工具统一装到同一个目录
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
           wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline.zip
           unzip -q cmdline.zip && mv cmdline-tools latest && rm cmdline.zip
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
           # 写入 license 文件（自动接受协议）
           mkdir -p $ANDROID_HOME/licenses
@@ -48,6 +47,11 @@ jobs:
           # 安装基础 SDK 组件
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
             "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+          # 让 buildozer 找到同一套 SDK
+          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "ANDROIDSDK=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools" >> $GITHUB_PATH
 
       - name: 🐍 安装 Python 依赖
         run: |
