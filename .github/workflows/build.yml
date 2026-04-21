@@ -66,6 +66,8 @@ jobs:
 
       - name: 🔨 构建 APK（buildozer 自动下载 NDK）
         run: |
+          export ANDROID_HOME=/home/runner/android-sdk
+          export ANDROIDSDK=/home/runner/android-sdk
           buildozer android debug
           ls -lh .buildozer/bin/
 
